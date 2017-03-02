@@ -1,21 +1,37 @@
-// Full spec-compliant TodoMVC with localStorage persistence
-// and hash-based routing in ~120 effective lines of JavaScript.
-// localStorage persistence
-var STORAGE_KEY = 'todos-vuejs-2.0';
+/*jshint esversion:6*/     //tells linter to be quiet about node syntax
+import Vue from 'vue';
+require('../index.html');
+require('../index.css');
+
+var routes = {
+  all: 'all',
+  active: 'active',
+  completed: 'completed'
+};
+
+function onHashChange() {
+  var route = window.location.hash.replace(/#\/?/, '');
+  if (routes[route]) {
+    app.currentRoute = route;
+  } else {
+    window.location.hash = '';
+    app.currentRoute = 'all';
+  }
+}
+
+window.addEventListener('hashchange', onHashChange);
+
+var STORAGE_KEY = 'todos-vuejs-2.1';
 var todoStorage = {
   fetch: function () {
     var todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    todos.forEach(function (todo, index) {
-      todo.id = index;
-    });
-    todoStorage.uid = todos.length;
     return todos;
   },
   save: function (todos) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
   }
 };
-// visibility filters
+
 var filters = {
   all: function (todos) {
     return todos;
@@ -31,112 +47,90 @@ var filters = {
     });
   }
 };
-// app Vue instance
-var app = new Vue({
-  // app initial state
+
+window.app = new Vue({
+
   data: {
     todos: todoStorage.fetch(),
     newTodo: '',
-    editedTodo: null,
-    visibility: 'all'
+    currentRoute: 'all',
+    editedTodo: false,
+    beforeEditCache: ''
   },
-  // watch todos change for localStorage persistence
-  watch: {
+  watch:{
     todos: {
       handler: function (todos) {
         todoStorage.save(todos);
-      },
-      deep: true
+      }
     }
   },
-  // computed properties
-  // http://vuejs.org/guide/computed.html
-  computed: {
+  computed:{
     filteredTodos: function () {
-      return filters[this.visibility](this.todos);
-    },
-    remaining: function () {
-      return filters.active(this.todos).length;
+      return filters[this.currentRoute](this.todos);
     },
     allDone: {
-      get: function () {
-        return this.remaining === 0;
-      },
+      get: function(){
+          return this.remaining === 0;
+        },
       set: function (value) {
         this.todos.forEach(function (todo) {
           todo.completed = value;
         });
       }
+    },
+    remaining: function () {
+      return filters.active(this.todos).length;
     }
   },
-  filters: {
-    pluralize: function (n) {
-      return n === 1 ? 'item' : 'items';
-    }
-  },
-  // methods that implement data logic.
-  // note there's no DOM manipulation here at all.
-  methods: {
-    addTodo: function () {
-      var value = this.newTodo && this.newTodo.trim();
-      if (!value) {
-        return;
+  filters:{},
+  methods:{
+    addTodo: function() {
+      var value = this.newTodo;
+      if (value === '') {
+        return('newTodo: empty');
       }
       this.todos.push({
-        id: todoStorage.uid++,
         title: value,
         completed: false
       });
       this.newTodo = '';
     },
     removeTodo: function (todo) {
-      this.todos.splice(this.todos.indexOf(todo), 1);
+        this.todos.splice(this.todos.indexOf(todo),1);
+    },
+    clearTodo: function(){
+      this.newTodo = '';
+    },
+    removeCompleted: function () {
+      this.todos = filters.active(this.todos);
     },
     editTodo: function (todo) {
       this.beforeEditCache = todo.title;
       this.editedTodo = todo;
     },
+    cancelEdit: function (todo) {
+      this.editedTodo = false;
+      todo.title = this.beforeEditCache;
+    },
     doneEdit: function (todo) {
       if (!this.editedTodo) {
         return;
       }
-      this.editedTodo = null;
+      this.editedTodo = false;
       todo.title = todo.title.trim();
       if (!todo.title) {
         this.removeTodo(todo);
       }
-    },
-    cancelEdit: function (todo) {
-      this.editedTodo = null;
-      todo.title = this.beforeEditCache;
-    },
-    removeCompleted: function () {
-      this.todos = filters.active(this.todos);
     }
   },
-  // a custom directive to wait for the DOM to be updated
-  // before focusing on the input field.
-  // http://vuejs.org/guide/custom-directive.html
-  directives: {
-    'todo-focus': function (el, value) {
-      if (value) {
+  directives:{
+    'todo-focus': function (el, expression){
+      if (expression.value === true) {
         el.focus();
       }
     }
   }
 });
-// handle routing
-function onHashChange() {
-  var visibility = window.location.hash.replace(/#\/?/, '');
-  if (filters[visibility]) {
-    app.visibility = visibility;
-  } else {
-    window.location.hash = '';
-    app.visibility = 'all';
-  }
-}
 
-window.addEventListener('hashchange', onHashChange);
+app.$mount('#todoapp');
 onHashChange();
-// mount
-app.$mount('.todoapp');
