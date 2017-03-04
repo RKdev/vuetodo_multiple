@@ -6,9 +6,9 @@
         <br/>
     </header>
     <section class="main">
-      <input class="toggle-all" type="checkbox" v-model="allDone">
+      <input class="toggle-all" type="checkbox">
       <ul class="todo-list">
-        <li class="todo" v-for="todo in filteredTodos" :class="{ completed: todo.completed, editing: todo == editedTodo }">
+        <li class="todo" v-for="todo in todos" :class="{ completed: todo.completed, editing: todo == editedTodo }">
           <div class="view">
            <input class="toggle" type="checkbox" v-model="todo.completed">
            <label @dblclick="editTodo(todo)">{{todo.title}}</label>
@@ -19,7 +19,7 @@
       </ul>
     </section>
     <footer class="footer">
-      <span class="todo-count" v-show="todos.length">Todo Count: {{remaining}}</span>
+      <span class="todo-count" v-show="todos.length">Todo Count: {{todos.length}}</span>
       <nav>
         <ul class="filters">
           <li><a href="#/all" :class="{ selected: currentRoute == 'all' }">All</a></li>
@@ -27,7 +27,7 @@
           <li><a href="#/completed" :class="{ selected: currentRoute == 'completed' }">Completed</a></li>
         </ul>
       </nav>
-      <button class="clear-completed" @click="removeCompleted" v-show="todos.length > remaining">Clear completed</button>
+      <button class="clear-completed" @click="removeCompleted" v-show="todos.length > 0">Clear completed</button>
     </footer>
     </section>
 </template>
@@ -47,7 +47,8 @@ export default {
   watch:{
     todos: {
       handler: function (todos) {
-        todoStorage.save(todos);
+        //todoStorage.save(todos);
+        console.log(this.todos);
       }
     }
   },
