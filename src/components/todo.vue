@@ -53,7 +53,7 @@ export default {
     }
   },
   computed:{
-/*    filteredTodos: function () {
+    filteredTodos: function () {
       return filters[this.currentRoute](this.todos);
     },
     allDone: {
@@ -68,7 +68,7 @@ export default {
     },
     remaining: function () {
       return filters.active(this.todos).length;
-    }*/
+    }
   },
   filters:{},
   methods:{
