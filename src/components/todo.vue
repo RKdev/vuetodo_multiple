@@ -6,7 +6,7 @@
         <br/>
     </header>
     <section class="main">
-      <input class="toggle-all" type="checkbox">
+      <input class="toggle-all" type="checkbox" v-model="allDone">
       <ul class="todo-list">
         <li class="todo" v-for="todo in todos" :class="{ completed: todo.completed, editing: todo == editedTodo }">
           <div class="view">
