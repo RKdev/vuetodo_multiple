@@ -29,13 +29,6 @@
       </nav>
       <button class="clear-completed" @click="removeCompleted" v-show="todos.length > 0">Clear completed</button>
     </footer>
-    <footer class="info">
-      <p>Double-click to edit a todo</p>
-      <p>Attribution info here: </p>
-      <p>Attribution info here:</p>
-      <br/>
-    </footer>
-
     </section>
 </template>
 
@@ -174,7 +167,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
   html,
   body {
   	margin: 0;
