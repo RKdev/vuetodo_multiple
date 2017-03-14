@@ -32,8 +32,8 @@
     </section>
 </template>
 
-<script>
 
+<script>
 var routes = {
   all: 'all',
   active: 'active',
@@ -52,7 +52,7 @@ function onHashChange() {
 
 window.addEventListener('hashchange', onHashChange);
 
-var STORAGE_KEY = 'todos-vuejs-2.3';
+var STORAGE_KEY = 'todos-vuejs-2.1';
 var todoStorage = {
   fetch: function () {
     var todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -83,9 +83,10 @@ export default {
   data: function () {
     return {
       greeting: 'Hello',
-      todos: todoStorage.fetch(),
+      todoID:'',      //id of todo list for current "tab"
+      todos: [],
       newTodo: '',
-      currentRoute: 'all',
+      currentRoute: '',
       editedTodo: false,
       beforeEditCache: ''
     }
@@ -93,7 +94,7 @@ export default {
   watch:{
     todos: {
       handler: function (todos) {
-        todoStorage.save(todos);
+        //odoStorage.save(todos);
         //console.log(this.todos);
       }
     }
